@@ -12,10 +12,7 @@ exports.handler = ( event, context, callback ) => {
         .then(function(autoscalingGroups) {
             terminateInstanceFromEachAutoscalingGroupIn(autoscalingGroups)
                 .then(function(results) {
-                    var result = {
-                        terminated_instances: results
-                    };
-                    callback( null, result );
+                    callback( null, results );
                 }, function(reason) {
                     console.log('Some async call failed:');
                     console.log(' --> ', reason);
@@ -59,25 +56,38 @@ function terminateInstanceFromEachAutoscalingGroupIn(autoscalingGroups){
 }
 
 function terminateInstanceIn(autoscalingGroup, resolve, reject) {
-    console.log('Attempting to terminate instance from: ' + autoscalingGroup['AutoScalingGroupName']);
-    var desiredCapacity = autoscalingGroup['DesiredCapacity'];
+    const autoscalingGroupName = autoscalingGroup['AutoScalingGroupName'];
+    console.log('Attempting to terminate instance from: ' + autoscalingGroupName);
+    const desiredCapacity = autoscalingGroup['DesiredCapacity'];
     console.log('Autoscaling group is expecting ' + desiredCapacity + ' instances');
     if (desiredCapacity < 2) {
         console.log('Too few instances, ignoring.');
-        resolve('none');
+        var response = {
+            autoscalingGroupName: autoscalingGroupName,
+            result: 'too few instances in group'
+        };
+        resolve(response);
     }
-    var instances = autoscalingGroup['Instances'];
+    const instances = autoscalingGroup['Instances'];
     const healthyInstances = instances.filter(instance => instance['LifecycleState'] == 'InService' && instance['HealthStatus'] == 'Healthy');
 
     if (healthyInstances.length < desiredCapacity) {
         console.log('Too few healthy instances, ignoring.')
-        resolve('none');
+        var response = {
+            autoscalingGroupName: autoscalingGroupName,
+            result: 'unhealthy instances in group'
+        };
+        resolve(response);
     } else {
-
         lookupOldestInstance(instances)
             .then(function (oldestInstance) {
                 terminateInstance(oldestInstance['InstanceId'])
-                resolve(oldestInstance['InstanceId']);
+                var response = {
+                    autoscalingGroupName: autoscalingGroupName,
+                    result: 'instance terminated',
+                    instanceId: oldestInstance['InstanceId']
+                };
+                resolve(response);
             }).catch(function (error) {
                 console.log(error);
             });

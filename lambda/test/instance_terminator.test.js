@@ -24,12 +24,12 @@ describe( 'instance-terminator', function() {
         var terminateInstance = sinon.spy();
         AWS.mock('AutoScaling', 'terminateInstanceInAutoScalingGroup', terminateInstance);
 
-        return LambdaTester( myLambda.handler )
+        return LambdaTester(myLambda.handler)
             .event()
-            .expectResult( ( result ) => {
-                expect( result.terminated_instances).to.have.lengthOf( 0 );
-                expect( describeInstances.notCalled, 'describe instances should not be called' ).to.be.true;
-                expect( terminateInstance.notCalled, 'terminate instance should not be called' ).to.be.true;
+            .expectResult((result) => {
+                expect(result).to.have.lengthOf(0);
+                expect(describeInstances.notCalled, 'describe instances should not be called').to.be.true;
+                expect(terminateInstance.notCalled, 'terminate instance should not be called').to.be.true;
             });
     });
 
@@ -42,14 +42,14 @@ describe( 'instance-terminator', function() {
         var terminateInstance = sinon.spy();
         AWS.mock('AutoScaling', 'terminateInstanceInAutoScalingGroup', terminateInstance);
 
-        return LambdaTester( myLambda.handler )
+        return LambdaTester(myLambda.handler)
             .event()
-            .expectResult( ( result ) => {
-                expect( result.terminated_instances).to.have.lengthOf( 1 );
-                expect( result.terminated_instances[0] ).to.equal( 'none' );
-                expect( describeInstances.notCalled, 'describe instances should not be called' ).to.be.true;
-                expect( terminateInstance.notCalled, 'terminate instance should not be called' ).to.be.true;
-        });
+            .expectResult((result) => {
+                expect(result).to.have.lengthOf(1);
+                expect(result).to.have.deep.members([{autoscalingGroupName: 'my-asg-1-instance', result: 'too few instances in group'}]);
+                expect(describeInstances.notCalled, 'describe instances should not be called').to.be.true;
+                expect(terminateInstance.notCalled, 'terminate instance should not be called').to.be.true;
+            });
     });
 
     it( `unhealthy instances in autoscaling groups`, function() {
@@ -61,14 +61,14 @@ describe( 'instance-terminator', function() {
         var terminateInstance = sinon.spy();
         AWS.mock('AutoScaling', 'terminateInstanceInAutoScalingGroup', terminateInstance);
 
-        return LambdaTester( myLambda.handler )
+        return LambdaTester(myLambda.handler)
             .event()
-            .expectResult( ( result ) => {
-                expect( result.terminated_instances).to.have.lengthOf( 1 );
-                expect( result.terminated_instances[0] ).to.equal( 'none' );
-                expect( describeInstances.notCalled, 'describe instances should not be called' ).to.be.true;
-                expect( terminateInstance.notCalled, 'terminate instance should not be called' ).to.be.true;
-        });
+            .expectResult((result) => {
+                expect(result).to.have.lengthOf(1);
+                expect(result).to.have.deep.members([{autoscalingGroupName: 'my-asg-unhealthy-instance', result: 'unhealthy instances in group'}]);
+                expect(describeInstances.notCalled, 'describe instances should not be called').to.be.true;
+                expect(terminateInstance.notCalled, 'terminate instance should not be called').to.be.true;
+            });
     });
 
     it( `successful invocation`, function() {
@@ -82,18 +82,18 @@ describe( 'instance-terminator', function() {
         var terminateInstance = sinon.spy();
         AWS.mock('AutoScaling', 'terminateInstanceInAutoScalingGroup', terminateInstance);
 
-        return LambdaTester( myLambda.handler )
+        return LambdaTester(myLambda.handler)
             .event()
-            .expectResult( ( result ) => {
-                expect( result.terminated_instances).to.have.lengthOf( 1 );
-                expect( result.terminated_instances[0] ).to.equal( 'i-instance-2' );
-                expect( terminateInstance.calledOnce, 'terminate instance called once' ).to.be.true;
+            .expectResult((result) => {
+                expect(result).to.have.lengthOf(1);
+                expect(result).to.have.deep.members([{autoscalingGroupName: 'my-asg', result: 'instance terminated', instanceId: 'i-instance-2'}]);
+                expect(terminateInstance.calledOnce, 'terminate instance called once').to.be.true;
 
                 var expectedParams = {
                     InstanceId: 'i-instance-2',
                     ShouldDecrementDesiredCapacity: false
                 };
-                expect( terminateInstance.calledWith(expectedParams), 'terminate instance parameters' ).to.be.true;
+                expect(terminateInstance.calledWith(expectedParams), 'terminate instance parameters').to.be.true;
             });
     });
 
@@ -112,23 +112,32 @@ describe( 'instance-terminator', function() {
         var terminateInstance = sinon.spy();
         AWS.mock('AutoScaling', 'terminateInstanceInAutoScalingGroup', terminateInstance);
 
-        return LambdaTester( myLambda.handler )
+        return LambdaTester(myLambda.handler)
             .event()
-            .expectResult( ( result ) => {
-                expect( result.terminated_instances).to.have.lengthOf( 2 );
-                expect( result.terminated_instances).to.have.members(['i-multiple-asgs-2', 'i-multiple-asgs-4']);
-                expect( terminateInstance.callCount, 'terminate instance called twice' ).to.equal(2);
+            .expectResult((result) => {
+                expect(result).to.have.lengthOf(2);
+                expect(result).to.have.deep.members([
+                    {
+                        autoscalingGroupName: 'my-asg-multiple-asgs',
+                        result: 'instance terminated',
+                        instanceId: 'i-multiple-asgs-2'
+                    }, {
+                        autoscalingGroupName: 'another-asg-multiple-asgs',
+                        result: 'instance terminated',
+                        instanceId: 'i-multiple-asgs-4'
+                    }]);
+                expect(terminateInstance.callCount, 'terminate instance called twice').to.equal(2);
 
                 var expectedParams1 = {
                     InstanceId: 'i-multiple-asgs-2',
                     ShouldDecrementDesiredCapacity: false
                 };
-                expect( terminateInstance.calledWith(expectedParams1), 'terminate instance parameters' ).to.be.true;
+                expect(terminateInstance.calledWith(expectedParams1), 'terminate instance parameters').to.be.true;
                 var expectedParams2 = {
                     InstanceId: 'i-multiple-asgs-4',
                     ShouldDecrementDesiredCapacity: false
                 };
-                expect( terminateInstance.calledWith(expectedParams2), 'terminate instance parameters' ).to.be.true;
+                expect(terminateInstance.calledWith(expectedParams2), 'terminate instance parameters').to.be.true;
             });
     });
 });
