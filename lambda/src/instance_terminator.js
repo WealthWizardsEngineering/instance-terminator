@@ -8,25 +8,38 @@ exports.handler = ( event, context, callback ) => {
     var tagKey = 'can-be-terminated'
     var tagValue = 'true'
 
-    /*
-    TODO:
-    * allow parameters to be overridden
-    * collect results and return them/fail (use Promise.all(): https://stackoverflow.com/questions/38426745/how-do-i-return-the-accumulated-results-of-multiple-parallel-asynchronous-func )
-     */
-    const autoscaling = new AWS.AutoScaling();
-
-    autoscaling.describeAutoScalingGroups({}, function(err, data) {
-        if (err) {
-            console.log(err, err.stack);
-            return callback(null, {success: false});
-        } else {
-            const matchingAutoscalingGroups = data['AutoScalingGroups'].filter(item => containsTag(item['Tags'], tagKey, tagValue));
-            matchingAutoscalingGroups.forEach(item => terminateInstanceIn(item))
-        }
-    });
-
-    return callback( null, { success: true } );
+    getAutoscalingGroups(tagKey, tagValue)
+        .then(function(autoscalingGroups) {
+            terminateInstanceFromEachAutoscalingGroupIn(autoscalingGroups)
+                .then(function(results) {
+                    var result = {
+                        terminated_instances: results
+                    };
+                    callback( null, result );
+                }, function(reason) {
+                    console.log('Some async call failed:');
+                    console.log(' --> ', reason);
+                    callback(reason);
+                });
+        }, function(reason) {
+            console.log(reason, reason.stack);
+            callback(reason);
+        });
 };
+
+function getAutoscalingGroups(tagKey, tagValue) {
+    return new Promise(function(resolve, reject) {
+        const autoscaling = new AWS.AutoScaling();
+        autoscaling.describeAutoScalingGroups({}, function(err, data) {
+            if (err) {
+                reject(err);
+            } else {
+                const matchingAutoscalingGroups = data['AutoScalingGroups'].filter(item => containsTag(item['Tags'], tagKey, tagValue));
+                resolve(matchingAutoscalingGroups);
+            }
+        });
+    });
+}
 
 function containsTag(tags, tagKey, tagValue) {
     return tags.some(function (tag) {
@@ -35,26 +48,36 @@ function containsTag(tags, tagKey, tagValue) {
     })
 }
 
-function terminateInstanceIn(autoscalingGroup) {
+function terminateInstanceFromEachAutoscalingGroupIn(autoscalingGroups){
+    var promises = [];
+    autoscalingGroups.forEach(function(item) {
+        promises.push(new Promise(function(resolve, reject) {
+            terminateInstanceIn(item, resolve, reject);
+        }));
+    })
+    return Promise.all(promises);
+}
+
+function terminateInstanceIn(autoscalingGroup, resolve, reject) {
     console.log('Attempting to terminate instance from: ' + autoscalingGroup['AutoScalingGroupName']);
     var desiredCapacity = autoscalingGroup['DesiredCapacity'];
     console.log('Autoscaling group is expecting ' + desiredCapacity + ' instances');
     if (desiredCapacity < 2) {
         console.log('Too few instances, ignoring.');
-        return;
+        resolve('none');
     }
-    // Are all instances healthy and is there the right number?
-    //const result = words.filter(word => word.length > 6);
     var instances = autoscalingGroup['Instances'];
     const healthyInstances = instances.filter(instance => instance['LifecycleState'] == 'InService' && instance['HealthStatus'] == 'Healthy');
 
     if (healthyInstances.length < desiredCapacity) {
         console.log('Too few healthy instances, ignoring.')
+        resolve('none');
     } else {
 
         lookupOldestInstance(instances)
             .then(function (oldestInstance) {
                 terminateInstance(oldestInstance['InstanceId'])
+                resolve(oldestInstance['InstanceId']);
             }).catch(function (error) {
                 console.log(error);
             });
