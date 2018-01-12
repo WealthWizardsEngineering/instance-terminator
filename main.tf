@@ -3,9 +3,9 @@ provider "archive" {
 }
 
 resource "aws_iam_policy" "instance_terminator_lambda" {
-  name        = "instance-terminator-lambda"
+  name        = "${var.name}-lambda"
   path        = "/"
-  description = "instance-terminator-lambda"
+  description = "${var.name}-lambda"
 
   policy = <<EOF
 {
@@ -48,7 +48,7 @@ EOF
 }
 
 resource "aws_iam_role" "instance_terminator_lambda" {
-  name = "instance-terminator-lambda"
+  name = "${var.name}-lambda"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -79,7 +79,7 @@ data "archive_file" "instance_terminator" {
 
 resource "aws_lambda_function" "instance_terminator" {
   filename         = "${data.archive_file.instance_terminator.output_path}"
-  function_name    = "instance_terminator"
+  function_name    = "${var.name}"
   role             = "${aws_iam_role.instance_terminator_lambda.arn}"
   handler          = "instance_terminator.handler"
   timeout          = 30
@@ -88,8 +88,8 @@ resource "aws_lambda_function" "instance_terminator" {
 }
 
 resource "aws_cloudwatch_event_rule" "lambda_instance_terminator" {
-  name                = "lambda_instance_terminator"
-  description         = "lambda_instance_terminator"
+  name                = "lambda_${var.name}"
+  description         = "lambda_${var.name}"
   schedule_expression = "${var.lambda_schedule}"
 }
 
