@@ -90,7 +90,7 @@ resource "aws_lambda_function" "instance_terminator" {
 resource "aws_cloudwatch_event_rule" "lambda_instance_terminator" {
   name                = "lambda_instance_terminator"
   description         = "lambda_instance_terminator"
-  schedule_expression = "rate(1 day)"
+  schedule_expression = "${var.lambda_schedule}"
 }
 
 resource "aws_cloudwatch_event_target" "lambda_instance_terminator" {
