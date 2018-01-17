@@ -67,6 +67,7 @@ function terminateInstanceIn(autoscalingGroup, resolve, reject) {
             result: 'too few instances in group'
         };
         resolve(response);
+        return;
     }
     const instances = autoscalingGroup['Instances'];
     const healthyInstances = instances.filter(instance => instance['LifecycleState'] == 'InService' && instance['HealthStatus'] == 'Healthy');
@@ -78,6 +79,7 @@ function terminateInstanceIn(autoscalingGroup, resolve, reject) {
             result: 'unhealthy instances in group'
         };
         resolve(response);
+        return;
     } else {
         lookupOldestInstance(instances)
             .then(function (oldestInstance) {
@@ -88,6 +90,7 @@ function terminateInstanceIn(autoscalingGroup, resolve, reject) {
                     instanceId: oldestInstance['InstanceId']
                 };
                 resolve(response);
+                return;
             }).catch(function (error) {
                 console.log(error);
             });
