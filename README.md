@@ -1,4 +1,4 @@
-# terrarform-lambda-instance-terminator
+# instance-terminator
 
 A AWS Lambda function to automatically terminate hosts on autoscaling groups - using Terraform.
 
@@ -22,7 +22,7 @@ To use this module in your Terraform definition, add the following:
 
 ```
 module "instance_terminator" {
-  source = "github.com/daveshepherd/terrarform-lambda-instance-terminator"
+  source = "github.com/WealthWizardsEngineering/instance-terminator"
 }
 ```
 
