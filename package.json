@@ -1,17 +1,28 @@
 {
   "name": "instance_terminator",
   "version": "0.0.1",
+  "engines": {
+    "node": "^6.10"
+  },
   "description": "Terminate ec2 instances within autoscaling groups",
+  "homepage": "https://github.com/daveshepherd/instance-terminator",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/daveshepherd/instance-terminator.git"
+  },
   "scripts": {
     "test:unit": "mocha --reporter spec --bail --check-leaks test/",
     "lint": "eslint *.js",
-    "dependency-check": "nsp check"
+    "dependency-check": "nsp check",
+    "package": "bestzip instance-terminator.zip src/*",
+    "release": "gh-release --dry-run -b 'release new version'"
   },
   "author": "Wealth Wizards",
   "license": "MIT",
   "devDependencies": {
     "aws-sdk-mock": "1.7.0",
-    "chai" : "4.1.2",
+    "bestzip": "1.1.4",
+    "chai": "4.1.2",
     "eslint": "4.19.1",
     "eslint-config-airbnb-base": "12.1.0",
     "eslint-plugin-import": "2.12.0",

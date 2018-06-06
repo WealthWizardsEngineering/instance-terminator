@@ -21,6 +21,10 @@ dependency-check:
 	${NPM} run dependency-check
 .PHONY: dependency-check
 
+package:
+	${NPM} run package
+.PHONY: package
+
 clean-up:
 	rm -rf node_modules instance_terminator.zip
 .PHONY: clean-up
