@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: quay.io/wealthwizards/ww-base-node:alpine-6
+      - image: node:8.10.0-alpine
     working_directory: /usr/src
     steps:
       - add_ssh_keys
