@@ -9,9 +9,17 @@ install:
 	${NPM} install
 .PHONY: install
 
+lint:
+	${NPM} run lint
+.PHONY: lint
+
 unit-test:
 	${DOCKER_RUN} unit-test
 .PHONY: unit-test
+
+dependency-check:
+	${NPM} run dependency-check
+.PHONY: dependency-check
 
 clean-up:
 	rm -rf node_modules instance_terminator.zip

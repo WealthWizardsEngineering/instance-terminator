@@ -1,10 +1,10 @@
 # instance-terminator
 
-A AWS Lambda function to automatically terminate hosts on autoscaling groups - using Terraform.
+A AWS Lambda function to automatically terminate hosts on autoscaling groups.
 
-This will run periodically and identify autoscaling groups tagged with can-be-terminated = 'true' and terminate the
-oldest instance as long as the group has 2 or more instances and the number of healthy instances is at least equal to
-the desired number of instances.
+When run it will identify autoscaling groups tagged with can-be-terminated = 'true' and terminate the oldest instance as
+long as the group has 2 or more instances and the number of healthy instances is at least equal to the desired number of
+instances.
 
 ## Rationale
 
@@ -18,14 +18,7 @@ so regularly terminating nodes will help highly issues quickly.
 
 ## Usage
 
-To use this module in your Terraform definition, add the following:
+Upload this as a lambda function that is trigger by a cloudwatch scheduled event.
 
-```
-module "instance_terminator" {
-  source = "github.com/WealthWizardsEngineering/instance-terminator"
-}
-```
-
-## Configuration
-
-* lambda_schedule - the schedule for the Lambda function, see the [Lambda documentation for details](https://docs.aws.amazon.com/lambda/latest/dg/tutorial-scheduled-events-schedule-expressions.html)
+This can be applied using this Terraform module:
+[instance-terminator-terraform](https://github.com/WealthWizardsEngineering/instance-terminator-terraform)

@@ -1,0 +1,22 @@
+{
+  "name": "instance_terminator",
+  "version": "0.0.1",
+  "description": "Terminate ec2 instances within autoscaling groups",
+  "scripts": {
+    "test": "mocha --reporter spec --bail --check-leaks test/",
+    "lint": "eslint *.js",
+    "dependency-check": "nsp check"
+  },
+  "author": "Wealth Wizards",
+  "license": "MIT",
+  "devDependencies": {
+    "aws-sdk-mock": "1.7.0",
+    "chai" : "4.1.2",
+    "eslint": "4.19.1",
+    "eslint-config-airbnb-base": "12.1.0",
+    "eslint-plugin-import": "2.12.0",
+    "lambda-tester": "3.1.1",
+    "mocha" : "4.1.0",
+    "nsp": "3.2.1"
+  }
+}
