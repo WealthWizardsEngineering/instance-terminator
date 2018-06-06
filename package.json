@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Terminate ec2 instances within autoscaling groups",
   "scripts": {
-    "test": "mocha --reporter spec --bail --check-leaks test/",
+    "test:unit": "mocha --reporter spec --bail --check-leaks test/",
     "lint": "eslint *.js",
     "dependency-check": "nsp check"
   },

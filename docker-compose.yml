@@ -14,4 +14,4 @@ services:
   unit-test:
     extends:
       service: npm
-    command: run test
+    command: run test:unit
