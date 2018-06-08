@@ -10,8 +10,3 @@ services:
     extends:
       service: node
     entrypoint: npm
-
-  unit-test:
-    extends:
-      service: npm
-    command: run test:unit

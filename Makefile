@@ -14,8 +14,12 @@ lint:
 .PHONY: lint
 
 unit-test:
-	${DOCKER_RUN} unit-test
+	${NPM} run test:unit
 .PHONY: unit-test
+
+component-test:
+	${NPM} run test:component
+.PHONY: component-test
 
 dependency-check:
 	${NPM} run dependency-check

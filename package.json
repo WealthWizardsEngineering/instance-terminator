@@ -11,10 +11,11 @@
     "url": "https://github.com/daveshepherd/instance-terminator.git"
   },
   "scripts": {
-    "test:unit": "mocha --reporter spec --bail --check-leaks test/",
+    "test:unit": "mocha --reporter spec --bail --check-leaks test/unit/* test/unit/**/*",
+    "test:component": "mocha --reporter spec --bail --check-leaks test/component/* test/component/**/*",
     "lint": "eslint *.js",
     "dependency-check": "nsp check",
-    "package": "bestzip instance-terminator.zip src/*",
+    "package": "bestzip instance-terminator.zip src/",
     "release": "gh-release --dry-run -b 'release new version'"
   },
   "author": "Wealth Wizards",
@@ -29,6 +30,7 @@
     "lambda-tester": "3.4.1",
     "mocha": "5.2.0",
     "nsp": "3.2.1",
+    "proxyquire": "2.0.1",
     "sinon": "5.1.0"
   }
 }
