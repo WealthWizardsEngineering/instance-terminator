@@ -1,0 +1,12 @@
+version: '2'
+services:
+  node:
+    image: node:8.10.0-alpine
+    volumes:
+      - .:/usr/src/app:z
+    working_dir: /usr/src/app
+
+  npm:
+    extends:
+      service: node
+    entrypoint: npm
