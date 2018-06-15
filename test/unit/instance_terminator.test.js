@@ -307,6 +307,35 @@ describe( 'instance-terminator', function() {
                 expect(terminateInstance.notCalled, 'terminate instance should not be called').to.be.true;
             });
     });
+
+    it( `should not terminate an instance across grouped asgs if the group has no instances`, function() {
+        const terminateInstance = sinon.spy();
+        const lookupOldestInstance = sinon.spy();
+        const myLambda = proxyquire( '../../src/instance_terminator', {
+            './aws/autoscaling_handler': {
+                findAutoscalingGroupsByTag: (tagKey, tagValue) => {
+                    expect(tagKey).to.equal('can-be-terminated');
+                    expect(tagValue).to.equal('true');
+                    return new Promise(function (resolve) {
+                        resolve(describeAutoscalingGroupsResponse_withGroupedAsgsWithNoInstances);
+                    });
+                },
+                terminateInstance: terminateInstance
+            },
+            './aws/ec2_handler': {
+                lookupOldestInstance: lookupOldestInstance
+            },
+        });
+
+        return LambdaTester(myLambda.handler)
+            .event()
+            .expectResult((result) => {
+                expect(result).to.have.lengthOf(1);
+                expect(result).to.have.deep.members([{instanceTerminatorGroupName: 'my-test-group', result: 'not enough healthy instances in group'}]);
+                expect(lookupOldestInstance.notCalled, 'lookupOldestInstance should not be called').to.be.true;
+                expect(terminateInstance.notCalled, 'terminate instance should not be called').to.be.true;
+            });
+    });
 });
 
 const describeAutoscalingGroupsResponse_withTooFewInstances = [
@@ -446,6 +475,31 @@ const describeAutoscalingGroupsResponse_withBadlyGroupedAsgs = [
             LifecycleState: 'InService',
             HealthStatus: 'Healthy'
         }],
+        Tags: [{
+            Key: 'instance-terminator-group',
+            Value: 'my-test-group'
+        }]
+    }
+]
+
+const describeAutoscalingGroupsResponse_withGroupedAsgsWithNoInstances = [
+    {
+        AutoScalingGroupName: 'my-asg-grouped-asgs',
+        MinSize: 0,
+        MaxSize: 0,
+        DesiredCapacity: 0,
+        Instances:  [],
+        Tags: [{
+            Key: 'instance-terminator-group',
+            Value: 'my-test-group'
+        }]
+    },
+    {
+        AutoScalingGroupName: 'another-asg-grouped-asgs',
+        MinSize: 0,
+        MaxSize: 0,
+        DesiredCapacity: 0,
+        Instances:  [],
         Tags: [{
             Key: 'instance-terminator-group',
             Value: 'my-test-group'

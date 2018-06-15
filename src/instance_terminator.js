@@ -118,7 +118,7 @@ function terminateOldestInstanceFrom(matchingAutoscalingGroups) {
             const instances = autoscalingGroup['Instances'];
             const healthyInstances = instances.filter(instance => instance['LifecycleState'] == 'InService' && instance['HealthStatus'] == 'Healthy');
 
-            if (healthyInstances.length < desiredCapacity) {
+            if (healthyInstances.length < desiredCapacity || desiredCapacity < 1) {
                 console.log('Too few healthy instances, ignoring.')
                 var response = {
                     result: 'not enough healthy instances in group'
