@@ -77,7 +77,7 @@ function terminateOldestInstanceFromEachGrouped(autoscalingGroups) {
     instanceTerminatorGroupNames.forEach(function(instanceTerminatorGroupName) {
         promises.push(new Promise(function(resolve) {
 
-            const matchingAutoscalingGroups = autoscalingGroups.filter(item => containsTag(item['Tags'], 'instance-terminator-group', instanceTerminatorGroupName));
+            const matchingAutoscalingGroups = autoscalingGroups.filter(item => containsTagValue(item['Tags'], 'instance-terminator-group', instanceTerminatorGroupName));
             console.log('Attempting to terminate instance from: ' + instanceTerminatorGroupName);
 
             if (matchingAutoscalingGroups.length < 2) {
@@ -175,6 +175,13 @@ function terminateOldestInstanceFrom(matchingAutoscalingGroups) {
 function containsTag(tags, tagKey) {
     return tags.some(function (tag) {
         if (tag['Key'] == tagKey)
+            return true;
+    })
+}
+
+function containsTagValue(tags, tagKey, tagValue) {
+    return tags.some(function (tag) {
+        if (tag['Key'] == tagKey && tag['Value'] == tagValue)
             return true;
     })
 }

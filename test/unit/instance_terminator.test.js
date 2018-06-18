@@ -336,6 +336,85 @@ describe( 'instance-terminator', function() {
                 expect(terminateInstance.notCalled, 'terminate instance should not be called').to.be.true;
             });
     });
+
+    it( `should terminate one instance when there is more than one grouped asgs`, function() {
+        const terminateInstance = sinon.spy();
+        const myLambda = proxyquire( '../../src/instance_terminator', {
+            './aws/autoscaling_handler': {
+                findAutoscalingGroupsByTag: (tagKey, tagValue) => {
+                    expect(tagKey).to.equal('can-be-terminated');
+                    expect(tagValue).to.equal('true');
+                    return new Promise(function (resolve) {
+                        resolve(describeAutoscalingGroupsResponse_withMultpleGroupedAsgs);
+                    });
+                },
+                terminateInstance: terminateInstance
+            },
+            './aws/ec2_handler': {
+                lookupOldestInstance: (instances) => {
+                    if (instances[0]['InstanceId'] == 'i-grouped-asgs-1') {
+                        expect(instances).to.deep.equal([{
+                            InstanceId: 'i-grouped-asgs-1',
+                            LifecycleState: 'InService',
+                            HealthStatus: 'Healthy'
+                        }, {
+                            InstanceId: 'i-grouped-asgs-2',
+                            LifecycleState: 'InService',
+                            HealthStatus: 'Healthy'
+                        }]);
+                        return new Promise(function (resolve) {
+                            resolve({InstanceId: 'i-grouped-asgs-2',LaunchTime: new Date('2018-01-11T09:56:50.000Z')});
+                        });
+                    }
+                    if (instances[0]['InstanceId'] == 'i-grouped-asgs-3') {
+                        expect(instances).to.deep.equal([{
+                            InstanceId: 'i-grouped-asgs-3',
+                            LifecycleState: 'InService',
+                            HealthStatus: 'Healthy'
+                        }, {
+                            InstanceId: 'i-grouped-asgs-4',
+                            LifecycleState: 'InService',
+                            HealthStatus: 'Healthy'
+                        }]);
+                        return new Promise(function (resolve) {
+                            resolve({InstanceId: 'i-grouped-asgs-4',LaunchTime: new Date('2018-01-11T09:56:50.000Z')});
+                        });
+                    }
+                    if (instances[0]['InstanceId'] == 'i-grouped-asgs-2') {
+                        expect(instances).to.deep.equal([{
+                            InstanceId: 'i-grouped-asgs-2',
+                            LaunchTime: new Date('2018-01-11T09:56:50.000Z')
+                        }, {
+                            InstanceId: 'i-grouped-asgs-4',
+                            LaunchTime: new Date('2018-01-11T09:56:50.000Z')
+                        }]);
+                        return new Promise(function (resolve) {
+                            resolve({InstanceId: 'i-grouped-asgs-4', LaunchTime: new Date('2018-01-11T09:56:50.000Z')});
+                        });
+                    }
+                }
+            },
+        });
+
+        return LambdaTester(myLambda.handler)
+            .event()
+            .expectResult((result) => {
+                expect(result).to.have.lengthOf(2);
+                expect(result).to.have.deep.members([
+                    {
+                        instanceTerminatorGroupName: "my-test-group1",
+                        result: 'instance terminated',
+                        instanceId: 'i-grouped-asgs-4'
+                    },{
+                        instanceTerminatorGroupName: "my-test-group2",
+                        result: 'instance-terminator-group tag only attached to one autoscaling group'
+                    }
+                ]);
+
+                expect(terminateInstance.callCount, 'terminate instance called once').to.equal(1);
+                expect(terminateInstance.calledWith('i-grouped-asgs-4'), 'terminate instance parameters').to.be.true;
+            });
+    });
 });
 
 const describeAutoscalingGroupsResponse_withTooFewInstances = [
@@ -505,4 +584,64 @@ const describeAutoscalingGroupsResponse_withGroupedAsgsWithNoInstances = [
             Value: 'my-test-group'
         }]
     }
+]
+
+const describeAutoscalingGroupsResponse_withMultpleGroupedAsgs = [
+    {
+        AutoScalingGroupName: 'my-asg-grouped-asgs',
+        MinSize: 2,
+        MaxSize: 2,
+        DesiredCapacity: 2,
+        Instances:  [{
+            InstanceId: 'i-grouped-asgs-1',
+            LifecycleState: 'InService',
+            HealthStatus: 'Healthy'
+        }, {
+            InstanceId: 'i-grouped-asgs-2',
+            LifecycleState: 'InService',
+            HealthStatus: 'Healthy'
+        }],
+        Tags: [{
+            Key: 'instance-terminator-group',
+            Value: 'my-test-group1'
+        }]
+    },
+    {
+        AutoScalingGroupName: 'another-asg-grouped-asgs',
+        MinSize: 2,
+        MaxSize: 2,
+        DesiredCapacity: 2,
+        Instances:  [{
+            InstanceId: 'i-grouped-asgs-3',
+            LifecycleState: 'InService',
+            HealthStatus: 'Healthy'
+        }, {
+            InstanceId: 'i-grouped-asgs-4',
+            LifecycleState: 'InService',
+            HealthStatus: 'Healthy'
+        }],
+        Tags: [{
+            Key: 'instance-terminator-group',
+            Value: 'my-test-group1'
+        }]
+    },
+    {
+        AutoScalingGroupName: 'third-grouped-asgs',
+        MinSize: 2,
+        MaxSize: 2,
+        DesiredCapacity: 2,
+        Instances:  [{
+            InstanceId: 'i-grouped-asgs-5',
+            LifecycleState: 'InService',
+            HealthStatus: 'Healthy'
+        }, {
+            InstanceId: 'i-grouped-asgs-6',
+            LifecycleState: 'InService',
+            HealthStatus: 'Healthy'
+        }],
+        Tags: [{
+            Key: 'instance-terminator-group',
+            Value: 'my-test-group2'
+        }]
+    },
 ]
