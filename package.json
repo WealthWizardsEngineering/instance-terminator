@@ -13,8 +13,7 @@
   "scripts": {
     "test:unit": "mocha --reporter spec --bail --check-leaks test/unit/* test/unit/**/*",
     "test:component": "mocha --reporter spec --bail --check-leaks test/component/* test/component/**/*",
-    "lint": "eslint *.js",
-    "dependency-check": "nsp check",
+    "lint": "eslint **/*.js",
     "package": "bestzip instance-terminator.zip src/",
     "release": "gh-release --dry-run -b 'release new version'"
   },
@@ -29,7 +28,6 @@
     "eslint-plugin-import": "2.16.0",
     "lambda-tester": "3.5.0",
     "mocha": "5.2.0",
-    "nsp": "3.2.1",
     "proxyquire": "2.1.0",
     "sinon": "7.2.3"
   }

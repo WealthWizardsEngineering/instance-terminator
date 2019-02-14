@@ -14,12 +14,6 @@ jobs:
           name: install
           command: npm install
       - run:
-          name: lint
-          command: npm run lint
-      - run:
-          name: dependency-check
-          command: npm run dependency-check
-      - run:
           name: unit-tests
           command: npm run test:unit
   release:
