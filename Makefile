@@ -9,10 +9,6 @@ install:
 	${NPM} install
 .PHONY: install
 
-lint:
-	${NPM} run lint
-.PHONY: lint
-
 unit-test:
 	${NPM} run test:unit
 .PHONY: unit-test
@@ -20,10 +16,6 @@ unit-test:
 component-test:
 	${NPM} run test:component
 .PHONY: component-test
-
-dependency-check:
-	${NPM} run dependency-check
-.PHONY: dependency-check
 
 package:
 	${NPM} run package
