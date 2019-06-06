@@ -20,15 +20,15 @@
   "author": "Wealth Wizards",
   "license": "MIT",
   "devDependencies": {
-    "aws-sdk-mock": "4.3.0",
-    "bestzip": "2.1.2",
+    "aws-sdk-mock": "4.3.1",
+    "bestzip": "2.1.4",
     "chai": "4.2.0",
-    "eslint": "5.13.0",
+    "eslint": "5.16.0",
     "eslint-config-airbnb-base": "13.1.0",
-    "eslint-plugin-import": "2.16.0",
+    "eslint-plugin-import": "2.17.3",
     "lambda-tester": "3.5.0",
-    "mocha": "5.2.0",
+    "mocha": "6.1.4",
     "proxyquire": "2.1.0",
-    "sinon": "7.2.3"
+    "sinon": "7.3.2"
   }
 }
