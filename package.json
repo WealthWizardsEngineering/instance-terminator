@@ -15,7 +15,9 @@
     "test:component": "mocha --reporter spec --bail --check-leaks test/component/* test/component/**/*",
     "lint": "eslint **/*.js",
     "package": "bestzip instance-terminator.zip src/",
-    "release": "gh-release --dry-run -b 'release new version'"
+    "release": "gh-release --dry-run -b 'release new version'",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "author": "Wealth Wizards",
   "license": "MIT",
@@ -30,5 +32,9 @@
     "mocha": "6.1.4",
     "proxyquire": "2.1.0",
     "sinon": "7.3.2"
+  },
+  "snyk": true,
+  "dependencies": {
+    "snyk": "^1.216.4"
   }
 }
