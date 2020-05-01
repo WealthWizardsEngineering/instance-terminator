@@ -1,0 +1,32 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.14.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-567746:
+    - eslint-plugin-import > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - eslint > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - sinon > @sinonjs/samsam > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - bestzip > async > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - eslint > inquirer > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - eslint > table > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - mocha > yargs-unparser > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - sinon > @sinonjs/formatio > @sinonjs/samsam > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - aws-sdk-mock > sinon > @sinonjs/samsam > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - bestzip > archiver > async > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - sinon > nise > @sinonjs/formatio > @sinonjs/samsam > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - aws-sdk-mock > sinon > @sinonjs/formatio > @sinonjs/samsam > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
+    - aws-sdk-mock > sinon > nise > @sinonjs/formatio > @sinonjs/samsam > lodash:
+        patched: '2020-05-01T05:52:42.187Z'
