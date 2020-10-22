@@ -2,7 +2,7 @@
   "name": "instance_terminator",
   "version": "0.0.15",
   "engines": {
-    "node": "8.10.0"
+    "node": "^12"
   },
   "description": "Terminate ec2 instances within autoscaling groups",
   "homepage": "https://github.com/daveshepherd/instance-terminator",
@@ -21,13 +21,13 @@
   "license": "MIT",
   "devDependencies": {
     "aws-sdk-mock": "4.5.0",
-    "bestzip": "2.1.5",
+    "bestzip": "2.1.7",
     "chai": "4.2.0",
     "eslint": "6.8.0",
     "eslint-config-airbnb-base": "13.2.0",
-    "eslint-plugin-import": "2.17.3",
-    "lambda-tester": "3.6.0",
-    "mocha": "6.2.2",
+    "eslint-plugin-import": "2.22.1",
+    "lambda-tester": "4.0.1",
+    "mocha": "6.2.3",
     "proxyquire": "2.1.3",
     "sinon": "7.5.0"
   }

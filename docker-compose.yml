@@ -1,7 +1,7 @@
 version: '2'
 services:
   node:
-    image: node:8.10.0-alpine
+    image: node:12.19.0-alpine3.12
     volumes:
       - .:/usr/src/app:z
     working_dir: /usr/src/app
