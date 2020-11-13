@@ -16,19 +16,24 @@ jobs:
       - run:
           name: unit-tests
           command: npm run test:unit
+      - run:
+          name: package
+          command: npm run package
+      - store_artifacts:
+          path: instance-terminator.zip
   release:
     machine: true
     steps:
       - add_ssh_keys
       - checkout
       - run:
-          name : patch-application
+          name: patch-application
           command: |
             git config --global user.email "circleci@wealthwizards.com"
             git config --global user.name "Circle CI"
             npm version patch -m "Release %s [ci skip]"
       - deploy:
-          name : deploy-git-changes
+          name: deploy-git-changes
           command: git push --follow-tags
 workflows:
   version: 2
