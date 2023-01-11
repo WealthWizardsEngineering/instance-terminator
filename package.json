@@ -1,6 +1,6 @@
 {
   "name": "instance_terminator",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "engines": {
     "node": "^12"
   },
